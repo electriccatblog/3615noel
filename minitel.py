@@ -25,8 +25,8 @@ def displayNoel():
     minitelWrite('\r\n $$  $$   $$  $$     $$     $$  $$            $$  $$   $$  $$   $$       $$')
     minitelWrite('\r\n  $$$$     $$$$    $$$$$$    $$$$             $$  $$    $$$$    $$$$$$   $$$$$$\r\n')
     minitelWrite('\r\n*******   ******   ******   *******   ***     ******   ******   ******   ******')
-    minitelWrite('\r\n                                                                By Jack & Papa')
-    minitelWrite('\\r\n')
+    minitelWrite('\r\n                                                         By ElectricCat.free.fr')
+    minitelWrite('\r\n')
     
 
 # Open the serial link with the Minitel
