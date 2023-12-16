@@ -350,11 +350,13 @@ while True:
                                 minitelWrite( ' Algorithme: choisir l\'une des valeurs suivantes :\r\n')
                                 minitelWrite( chr(24) + chr(24) + ' 3-4-5-6-10 ou Q pour Quitter\r\n')
                             currentProg = "algo"
+                            blink = False
                         elif inputvalue == 'D':
                             currentLedChoice = 1
                             minitelWrite (' Degrade > Choisir la couleur %i\r\n' % currentLedChoice)
                             currentProg = "grad"
                             algoName = "Degrade "
+                            blink = False
                 #Algo or Gradient Enabled
                 elif algoEnabled == 1:
                     if currentProg == "algo":
@@ -373,13 +375,8 @@ while True:
                                 minitelWrite( chr(24) + chr(24) + 'Choix invalide! Choisir une valeur 3-4-5-6-10, D (dernier choix), ou Q\r\n')
                             elif inputvalue=="D" and lastAlgoChoice > 0:
                                 minitelWrite( chr(24) + chr(24) + ' Reponse = dernier choix\r\n')
-                                print (lastAlgoChoice)
-                                numLed = 0
-                                for x in range(numpix):
-                                    if numLed == lastAlgoChoice:
-                                        numLed = 0
-                                    updateLed(x,lastcolorList[numLed])
-                                    numLed = numLed + 1
+                                minitelWrite ('Mise a jour des LEDs en cours...\r\n')
+                                displayAlgo(lastAlgoChoice, lastcolorList, progressiveMode)
                                 algoEnabled = 0
                                 algoChoice = 0
                                 currentLedChoice = 0
