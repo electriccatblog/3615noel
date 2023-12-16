@@ -12,11 +12,13 @@ Code en MicroPython à charger sur un Raspberry Pico W.
 
 
 ## Installation
+Modifier le code du fichier main.py pour adapter le nombre de led à piloter en fonction des rubans leds installés.
 Copier les 3 fichiers sur le Raspberry Pico.
+
 
 Schéma Fritzing : 
 
 ![schéma Fritzing](docs/3615noel-fritzing.png)
 
-Plus de détails disponibles sur le site [ElectricCat](http://electriccat.free.fr/)
+Plus de détails disponibles sur le site [ElectricCat](http://electriccat.free.fr/3615noel/)
 

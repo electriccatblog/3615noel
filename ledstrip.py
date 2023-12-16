@@ -23,7 +23,7 @@ c_brown = (188, 101, 29)
 ledList = [('OFF', c_off, 'Off'), ('B', c_white, 'Blanc'), ('BL', c_blue, 'Bleu'), ('J', c_yellow, 'Jaune'), ('O', c_orange, 'Orange'), ('R', c_red, 'Rouge'), ('V', c_green, 'Vert'), ('VI', c_purple, 'Violet'), ('M', c_brown, 'Marron')]
 
 # Number of LEDs
-numpix = 420
+numpix = 1020
 
 #Test if value exists
 def existsInList(value):
@@ -53,6 +53,16 @@ def updateLed(ledNumber, value):
         ledstrip.set_pixel(ledNumber, ledChoice[1])
         ledstrip.show()
         return ledChoice
+
+#Change the colour of a list of LEDs based on the given number with the value 
+def updateLedList(ledNumberList, value, progressiveMode):
+    ledChoice = getItemFromList(value);
+    if (ledChoice):
+        for ledNumber in ledNumberList:
+            ledstrip.set_pixel(ledNumber, ledChoice[1])
+        if progressiveMode == True:
+            ledstrip.show()
+    return ledChoice
 
 #Fill the entire strip with the colour
 def fillStrip(value):
@@ -96,6 +106,20 @@ def displayRainbow():
 def displayGradient(ledChoice1, ledChoice2):
     ledstrip.set_pixel_line_gradient(0, numpix - 1, ledChoice1[1], ledChoice2[1])
     ledstrip.show()
+
+def displayAlgo(algoChoice, colorList, progressiveMode):
+    numLed = 0
+    for x in range(algoChoice):
+        ledColorList = []
+        for y in range(numpix):
+            if numLed == algoChoice:
+                numLed = 0
+            if numLed == x:
+                ledColorList.append(y)
+            numLed = numLed + 1
+        updateLedList(ledColorList,colorList[x],progressiveMode)
+    if progressiveMode == False:
+        ledstrip.show()
 
 # Initialize LED string
 ledstrip = Neopixel(numpix, 0, 28, "GRB")

@@ -8,12 +8,17 @@ from picozero import pico_temp_sensor
 
 from machine import Pin
 
+import random
+
 #Local files
 from ledstrip import *
 from minitel  import *
 
 #STAR xmas tree led on GPIO 13
 led=Pin(13,Pin.OUT)
+
+global cat
+cat = False
 
 #Update Minitel screen info
 def updateScreen():
@@ -22,7 +27,10 @@ def updateScreen():
     for i in range(num_lignes-10):
         minitelWrite('\r\n')
     ##3615 Noel
-    displayNoel()
+    if (cat == True):
+        displayCat()
+    else:
+        displayNoel()
     ##Infos
     minitelWrite( chr(24) + ' LED Etoile sapin : %s ' % statutLED )
     minitelWrite( '- Temperature : %i\r\n' % temp)
@@ -31,10 +39,10 @@ def updateScreen():
     minitelWrite( ' - Brightness : %i (1/2  : -/+)  \r\n' % brightnessValue)
     minitelWrite( chr(24) + chr(24) + ' %s\r\n' % statusLedStrip)
     minitelWrite( chr(24) + ' Couleurs : B : blanc - BL : bleu - J : jaune - M : marron\r\n')
-    minitelWrite( chr(24) + '            O : orange - R : rouge - V : vert - VI : violet\r\n')
+    minitelWrite( chr(24) + '            O : orange - R : rouge - V : vert - VI : violet - X : random\r\n')
     minitelWrite( chr(24) + '            Couleur RGB : <code r>,<code g>,<code b>. Ex : 255,100,10\r\n')
     minitelWrite( chr(24) + chr(24) + ' 0 : eteindre - <code couleur> : remplir ruban led - * : Reset\r\n') 
-    minitelWrite( chr(24) + chr(24) + ' C : clignoter (on/off), C<number> : delai en ms, CP/CM : vitesse +/-\r\n')
+    minitelWrite( chr(24) + chr(24) + ' C : clignoter, C<number> : delai ms, CP/CM : vitesse +/-, CA : algo mode\r\n')
     minitelWrite( chr(24) + chr(24) + ' P1 : Arc en ciel - FR : Drapeau FR -  A : algorithme - D : degrade\r\n')
     bip()
 
@@ -61,7 +69,7 @@ blinkState = False
 blinkCounter = -1
 blinkSpeed = 500
 #Led Blink variable
-blinkLed = False
+blinkLed = True
 blinkStateLed = False
 blinkCounterLed = -1
 
@@ -73,33 +81,53 @@ currentLedChoice = 0
 algoName = ""
 lastAlgoName = ""
 buffer = ''
+progressiveMode = False
 #Algo color list
 colorList = []
 lastcolorList = []
+
+#Default: arc en ciel
+displayRainbow()
+statusLedStrip="Arc en ciel"
+currentProg = "rainbow"
 
 updateScreen()
 #list of colors 
 colorChoicePrompt = getColours()
 
-#Star led on
+#Default: Blinking Star led on
 led.value(1)
 
+def getRandomColor():
+    randomR = random.randint(0, 255)
+    randomG = random.randint(0, 255)
+    randomB = random.randint(0, 255)
+    random_color = (randomR, randomG, randomB)
+    print(random_color)
+    return random_color 
+                        
 def showLastLedStrip():
-    if currentProg == "fill" or currentProg == "fillrgb" or currentProg == "rainbow" or currentProg == "fr" or currentProg == "grad":
-        if currentProg == "fill":
-            fillStrip(fillColor)
-            ledstrip.show()
-        elif currentProg == "fillrgb":
-            ledstrip.fill(custom_color)
-            ledstrip.show()
-        elif currentProg == "rainbow":
-            displayRainbow()
-        elif currentProg == "fr":
-            displayFRFlag()
-        elif currentProg == "grad" and gradColor1!= "" and gradColor2!= "":
-            ledChoice1 = getItemFromList(gradColor1)
-            ledChoice2 = getItemFromList(gradColor2)
-            displayGradient(ledChoice1, ledChoice2)
+#     if currentProg == "fill" or currentProg == "random" or currentProg == "fillrgb" or currentProg == "rainbow" or currentProg == "fr" or currentProg == "grad":
+    if currentProg == "fill":
+        fillStrip(fillColor)
+        ledstrip.show()
+    elif currentProg == "fillrgb":
+        ledstrip.fill(custom_color)
+        ledstrip.show()
+    elif currentProg == "rainbow":
+        displayRainbow()
+    elif currentProg == "fr":
+        displayFRFlag()
+    elif currentProg == "grad" and gradColor1!= "" and gradColor2!= "":
+        ledChoice1 = getItemFromList(gradColor1)
+        ledChoice2 = getItemFromList(gradColor2)
+        displayGradient(ledChoice1, ledChoice2)
+    elif currentProg == "random":
+        random_color = getRandomColor()
+        ledstrip.fill(random_color)
+        ledstrip.show()
+    elif currentProg == "algo":
+        displayAlgo(lastAlgoChoice, lastcolorList,progressiveMode)
 
 #Extract counter value for the strip led blink speed
 def extractCounterValue(c):
@@ -123,7 +151,7 @@ def extractCounterValue(c):
 while True:
     _data = ser.read()
     #Strip LED Blink
-    if blink == True and currentProg != "algo":
+    if blink == True:
         blinkCounter += 1
         if blinkCounter > blinkSpeed:
             if blinkState == False:
@@ -189,6 +217,20 @@ while True:
             #Reset screen
             elif inputvalue == '*':
                 validEntry = True
+            #Algo Progressive mode on/off
+            elif inputvalue == 'CA':
+                if (progressiveMode == True):
+                    progressiveMode = False
+                else:
+                    progressiveMode = True
+                print(progressiveMode)
+            #Hidden function
+            elif inputvalue == 'CAT':
+                if (cat == True):
+                    cat = False
+                else:
+                    cat = True
+                updateScreen()
             #Change brightness (1: -, 2: +)
             elif inputvalue == '1' or inputvalue == '2':
                 if brightnessValue < 254 and inputvalue == '2':
@@ -238,10 +280,10 @@ while True:
                         showLastLedStrip()
                         blink = False
                 elif inputvalue == 'CP' and blink == True and blinkSpeed > 0:
-                        blinkSpeed -= 150
+                        blinkSpeed -= 100
                         print (blinkSpeed)
                 elif inputvalue == 'CM' and blink == True and blinkSpeed < 3000:
-                        blinkSpeed += 150
+                        blinkSpeed += 100
                         print (blinkSpeed)
                 #Counter value
                 elif len(inputvalue) > 1 and inputvalue[0] == 'C':
@@ -267,6 +309,17 @@ while True:
                         currentProg = "fill"
                         fillColor = inputvalue
                         statusLedStrip = ledChoice[2]
+                    #Fill LED Random
+                    elif inputvalue == 'X':
+                        bip()
+                        random_color = getRandomColor()
+                        ledstrip.fill(random_color)
+                        ledstrip.show()
+                        ledChoice = "random"
+                        validEntry = True
+                        currentProg = "random"
+                        fillColor = random_color
+                        statusLedStrip = "random"
                     #stripLed Rainbow
                     if inputvalue == 'P1':
                         bip()
@@ -354,12 +407,8 @@ while True:
                                 algoName = algoName + ledChoice[2] + " "
                                 colorList.append(inputvalue)
                                 if currentLedChoice == algoChoice:
-                                    numLed = 0
-                                    for x in range(numpix):
-                                        if numLed == algoChoice:
-                                            numLed = 0
-                                        updateLed(x,colorList[numLed])
-                                        numLed = numLed + 1
+                                    minitelWrite ('Mise a jour des LEDs en cours...\r\n')
+                                    displayAlgo(algoChoice, colorList,progressiveMode)
                                     statusLedStrip = algoName
                                     lastAlgoName = algoName
                                     #copy colorList to lastcolorList
