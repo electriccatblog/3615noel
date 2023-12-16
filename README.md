@@ -1,6 +1,6 @@
 # 3615 Noel : Projet Raspberry Pico pour controler un ruban LED depuis un Minitel
 Code en MicroPython à charger sur un Raspberry Pico W.
-
+![photo](docs/3615noel-minitel-sapin.png)
 ## Fichiers
 * main.py : programme principal lancé automatiquement par le Pico au démarrage
 * minitel.py : liaison série UART avec le minitel pour afficher le contenu à l'écran
