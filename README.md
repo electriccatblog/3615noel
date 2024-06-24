@@ -11,7 +11,7 @@ Code en MicroPython à charger sur un Raspberry Pico W.
 * [PicoZero](https://pypi.org/project/picozero/)
 
 
-## Installation
+## Installation 
 Modifier le code du fichier main.py pour adapter le nombre de led à piloter en fonction des rubans leds installés.
 Copier les 3 fichiers sur le Raspberry Pico.
 
